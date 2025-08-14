@@ -1,104 +1,72 @@
-// ===== GENESIS-OS SACRED RULES: ZERO MANUAL COMPILER CONFIG =====
+// ===== GENESIS BLEEDING-EDGE BUILD CONFIGURATION =====
+// Version Catalog (libs.versions.toml) is the single source of truth
+
+@file:Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
+    // Core Android
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    
+    // Kotlin
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    
+    // Compose
+    alias(libs.plugins.compose.compiler) apply false
+    
+    // Build & Code Generation
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.hilt.android) apply false
+    
+    // Google Services
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
+    
+    // Version Management
+    alias(libs.plugins.ben.manes.versions) apply false
+    
+    // API
+    alias(libs.plugins.openapi.generator) apply false
 }
 
-android {
-    // FIX: Valid namespace without hyphens
-    namespace = "dev.aurakai.auraframefx.featuremodule"
-    // AUTO-EVERYTHING: Use libs.versions.toml
-    compileSdk = libs.versions.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-
-
-    packaging {
-        resources {
-            excludes += setOf(
-                "/META-INF/{AL2.0,LGPL2.1}",
-                "/META-INF/AL2.0",
-                "/META-INF/LGPL2.1"
-            )
-        }
-    }
-
-    sourceSets {
-        getByName("main") {
-            kotlin.srcDir("build/generated/openapi/src/main/kotlin")
+// Configure all projects (including root)
+allprojects {
+    // Apply detekt to all projects
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    
+    // K2 compiler configuration for Kotlin projects
+    plugins.withId("org.jetbrains.kotlin.android") {
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+            compilerOptions {
+                freeCompilerArgs.addAll(
+                    "-Xcontext-receivers",
+                    "-opt-in=kotlin.RequiresOptIn",
+                    "-Xjvm-default=all"
+                )
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.jvmTarget.get()))
+                languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+                apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2)
+            }
         }
     }
     
-    // AUTO-PROVISIONED: Remove hardcoded buildToolsVersion
-    buildToolsVersion = libs.versions.compileSdk.get()
-
-}
-
-dependencies {
-    // SACRED RULE #5: DEPENDENCY HIERARCHY - All modules depend on :core-module and :app
-    implementation(project(":core-module"))
-    implementation(project(":app"))
-
-    // Core AndroidX
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-
-    // Hilt Dependency Injection
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-
-    // OpenAPI Generated Code Dependencies
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.kotlinx.serialization)
-    implementation(libs.okhttp3.logging.interceptor)
-    implementation(libs.kotlinx.serialization.json)
-
-    // Compose
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.bundles.compose)
-    implementation(libs.androidx.navigation.compose)
-
-    // Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
-
-    // Core library desugaring
-    coreLibraryDesugaring(libs.coreLibraryDesugaring)
-
-    // Testing
-    testImplementation(libs.bundles.testing)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    // System interaction and documentation (using local JAR files)
-    implementation(files("${project.rootDir}/Libs/api-82.jar"))
-    implementation(files("${project.rootDir}/Libs/api-82-sources.jar"))
+    // Detekt configuration for all projects
+    detekt {
+        toolVersion = libs.versions.detekt.get()
+        config = files("${rootProject.projectDir}/config/detekt/detekt.yml")
+        buildUponDefaultConfig = true
+        parallel = true
+        autoCorrect = true
+    }
+    
+    // Configure detekt tasks
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt> {
+        reports {
+            html.required.set(true)
+            xml.required.set(false)
+            txt.required.set(false)
+            sarif.required.set(false)
+        }
+    }
 }

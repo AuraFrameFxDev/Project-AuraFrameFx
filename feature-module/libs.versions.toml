@@ -1,0 +1,86 @@
+[versions]
+# ===== BUILD TOOLS =====
+javaToolchain = "23"
+jvmTarget = "24"
+agp = "8.13.0-alpha04"
+gradle = "9.0.0"
+
+# ===== KOTLIN =====
+kotlin = "2.2.20-Beta2"
+ksp = "2.2.20-Beta2-2.0.2"
+
+# ===== DEPENDENCIES =====
+hilt = "2.57"
+composeBom = "2025.08.00"
+lifecycle = "2.9.2"
+room = "2.7.2"
+
+# ===== QUALITY =====
+detekt = "1.24.0"
+spotless = "7.2.1"
+dokka = "2.1.0"
+benManesVersions = "0.51.0"
+
+# ===== GOOGLE =====
+googleServices = "4.4.3"
+firebaseCrashlytics = "3.0.2"
+
+# ===== ANDROID =====
+compileSdk = "36"
+minSdk = "33"
+targetSdk = "36"
+ndkVersion = "27.0.12077973"
+
+[plugins]
+# ===== ANDROID =====
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+
+# ===== KOTLIN =====
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+# ===== HILT =====
+hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+
+# ===== GOOGLE =====
+googleServices = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebaseCrashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
+
+# ===== QUALITY =====
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+benManesVersions = { id = "com.github.ben-manes.versions", version.ref = "benManesVersions" }
+
+# ===== API =====
+openapiGenerator = { id = "org.openapi.generator", version = "7.14.0" }
+
+[libraries]
+# ===== ANDROIDX =====
+androidxCoreKtx = { group = "androidx.core", name = "core-ktx", version = "1.17.0" }
+androidxAppcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.7.1" }
+androidxLifecycleRuntimeKtx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+
+# ===== COMPOSE =====
+androidxComposeBom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidxComposeUi = { group = "androidx.compose.ui", name = "ui" }
+androidxComposeUiTooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidxComposeUiToolingPreview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidxComposeMaterial3 = { group = "androidx.compose.material3", name = "material3" }
+
+# ===== ROOM =====
+androidxRoomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidxRoomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidxRoomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
+# ===== HILT =====
+hiltAndroid = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hiltCompiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+
+# ===== TESTING =====
+junit = { group = "junit", name = "junit", version = "4.13.2" }
+androidxTestExtJunit = { group = "androidx.test.ext", name = "junit", version = "1.1.5" }
+espressoCore = { group = "androidx.test.espresso", name = "espresso-core", version = "3.5.1" }
