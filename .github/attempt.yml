@@ -1,0 +1,22 @@
+name: Production Build
+
+on:
+  push:
+    branches: [ Master ]
+  pull_request:
+    branches: [ Master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+      - name: Build Bleeding-Edge APK
+        run: ./gradlew bleedingEdgeBuild
+      - name: Run All Tests
+        run: ./gradlew test integrationTest uiTest
